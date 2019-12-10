@@ -18,32 +18,23 @@
 #include <grp.h>
 #include <string.h>
 
-
-
-
 #define REQ_QUEUE 	10010
 #define RESP_QUEUE 	10020
 #define MAX_TEXT_SIZE 	1000
-
-
-
-
-
-
 
 //Struct para receber
 struct reqmsg {
  	long cli_id;
 	char resposta_cli[MAX_TEXT_SIZE+1];   	
-    	char comando[MAX_TEXT_SIZE+1];
+	char comando[MAX_TEXT_SIZE+1];
 	char path [MAX_TEXT_SIZE+1];	
+	char caminho [MAX_TEXT_SIZE+1];
 };
 //Struct para enviar
 struct respmsg {
 	long cli_id;
 	char resposta[MAX_TEXT_SIZE+1];
 };
-
 
 
 ls()
@@ -110,16 +101,17 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		if(strcmp(cli_reqmsg->comando,"dirlist")==0)
 		{
 			
-			//if(fork()==0){execlp("/bin/sh", "sh", "-c","ls -l > log.txt ", cli_reqmsg->path, "log.txt", (char *)0);} 
-
-			
 			
  
 		} 
 		else if(strcmp(cli_reqmsg->comando,"myid")==0)
 		{ 
 			printf("MYID: %ld\n",cli_reqmsg->cli_id);
-		} //mostra id do cliente			
+		} //mostra id do cliente
+		else if(strcmp(cli_reqmsg->comando,"cd")==0)
+		{ 
+			
+		}			
 		else if(strcmp(cli_reqmsg->comando,"exit")==0)
 		{ 
 			exit(0);
