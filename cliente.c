@@ -19,7 +19,6 @@ struct reqmsg {
 	char resposta_cli[MAX_TEXT_SIZE+1]; 
    	char comando[MAX_TEXT_SIZE+1];
 	char path [MAX_TEXT_SIZE+1];
-	char caminho [MAX_TEXT_SIZE+1];
    	
 	
 };
@@ -94,25 +93,19 @@ void main()
 		fflush(stdin);
 		fflush(stdout);
 		
-		path = getcwd(path,0);       
+		path = getcwd(path,0);
+		strcpy(cli_reqmsg.path,path);       
 
         //Define a mensagem inicial a ser exibida
         printf("~ %s : ",path);
 		scanf("%[^\n]s",cli_reqmsg.comando);
-       	        scanf("%*c");	
-		if(strcmp(cli_reqmsg.comando,"cd")==0){
-			printf("Digite o caminho \n");
-			scanf("%[^\n]s",cli_reqmsg.caminho);
-       	        scanf("%*c");	
-		}		
+       	        scanf("%*c");			
 		
-		//strcpy(cli_reqmsg.path,path);
+		
 		
 	         
 		
 			// Preenche o tipo da mensagem com o identificador (PID) do cliente
-		if(strcmp(cli_reqmsg.comando,"cd")==0){ chdir(cli_reqmsg.caminho);}
-		
 			cli_reqmsg.cli_id = cli_id;
 
 			// Envia requisicao ao servidor
@@ -125,7 +118,7 @@ void main()
 				exit(1);
 			}
 			// Apresenta o nome da thread e que ela finalizou de rodar no servidor
-			//printf("%s\n", serv_respmsg.resposta);
+			printf("%s\n", serv_respmsg.resposta);
 			
 			//leArquivo();
 			
