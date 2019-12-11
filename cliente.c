@@ -19,6 +19,9 @@ struct reqmsg {
 	char resposta_cli[MAX_TEXT_SIZE+1]; 
    	char comando[MAX_TEXT_SIZE+1];
 	char path [MAX_TEXT_SIZE+1];
+	char caminho [MAX_TEXT_SIZE+1];
+	char texto_msg[MAX_TEXT_SIZE+1];
+	long id_destino;
    	
 	
 };
@@ -30,33 +33,6 @@ struct respmsg {
 	char resposta[MAX_TEXT_SIZE+1];
 };
 
-void leArquivo()	
-{
-  FILE *arq;
-  char Linha[100];
-  char *result;
-  int i;
-  //system("clear");
-  // Abre um arquivo TEXTO para LEITURA
-  arq = fopen("log.txt", "rt");
-  if (arq == NULL)  // Se houve erro na abertura
-  {
-     printf("Problemas na abertura do arquivo\n");
-     return;
-  }
-  i = 1;
-  while (!feof(arq))
-  {
-	// Lê uma linha (inclusive com o '\n')
-      result = fgets(Linha, 500, arq);  // o 'fgets' lê até 99 caracteres ou até o '\n'
-      //if (result)  // Se foi possível ler
-	  printf( "%s",Linha);
-      i++;
-  }
-  fclose(arq);  
-}
-
-
 
 void main()
 {
@@ -66,15 +42,19 @@ void main()
 	struct reqmsg cli_reqmsg;
 	struct respmsg serv_respmsg;
 	long cli_id;
-    	int tempo;
+    int tempo;
 	FILE *arq;
 	char *path;
 
 	system("clear");
+	printf("=================================================================\n");	
 	printf("================SHELL SISTOPERACIONAIS INICIOU===================\n");
+	printf("===============DIGITE HELP PARA VER OS COMANDOS==================\n");
+	printf("============APERTE ENTER PARA EXECUTAR OS COMANADOS==============\n");	
 	printf("=================================================================\n");			
 
 //Define o id para conexão
+
 	cli_id = getpid();
 	req_mq = msgget(REQ_QUEUE, 0777);
 
@@ -93,37 +73,51 @@ void main()
 		fflush(stdin);
 		fflush(stdout);
 		
-		path = getcwd(path,0);
-		strcpy(cli_reqmsg.path,path);       
+		//copia o path
+		path = getcwd(path,0);       
 
         //Define a mensagem inicial a ser exibida
         printf("~ %s : ",path);
 		scanf("%[^\n]s",cli_reqmsg.comando);
-       	        scanf("%*c");			
-		
-		
-		
-	         
-		
-			// Preenche o tipo da mensagem com o identificador (PID) do cliente
+       	scanf("%*c");
+
+		//verifica para mudar o diretório	
+		if(strcmp(cli_reqmsg.comando,"godir")==0||(cli_reqmsg.comando,"GODIR")==0){
+			printf("Digite o caminho \n");scanf("%[^\n]s",cli_reqmsg.caminho);scanf("%*c");chdir(cli_reqmsg.caminho);	
+		}		
+		if(strcmp(cli_reqmsg.comando,"logar")==0||(cli_reqmsg.comando,"LOGAR")==0){
+			 printf("~ %s : Digite seu id ",path);
+				scanf("%ld", &cli_id);
+       	        scanf("%*c");	
+		}	
+		if(strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0){
+			 printf("~ %s : Digite sua mensagem: ",path);
+				scanf("%[^\n]s",cli_reqmsg.texto_msg);
+       	        scanf("%*c");
+			printf("~ %s : Digite o id destino: ",path);
+				scanf("%ld",&cli_reqmsg.id_destino);
+       	        scanf("%*c");
+		}
+		//copia o id
 			cli_reqmsg.cli_id = cli_id;
 
-			// Envia requisicao ao servidor
+		// Envia requisicao ao servidor
 			msgsnd(req_mq,&cli_reqmsg,sizeof(struct reqmsg),0);
             
-			// Espera pela mensagem de resposta especifica para este cliente
-			// usando o PID do processo cliente como tipo de mensagem
-			if (msgrcv(resp_mq,&serv_respmsg,sizeof(struct respmsg),cli_id,0) < 0){
-				printf("msgrcv falhou no cliente\n");
-				exit(1);
-			}
-			// Apresenta o nome da thread e que ela finalizou de rodar no servidor
-			printf("%s\n", serv_respmsg.resposta);
+		// Espera pela mensagem de resposta especifica para este cliente
+		// usando o PID do processo cliente como tipo de mensagem
 			
-			//leArquivo();
 			
-			path = getcwd(path,0);
+		if (msgrcv(resp_mq,&serv_respmsg,sizeof(struct respmsg),cli_id,0) < 0){
+			printf("msgrcv falhou no cliente\n");
+			exit(1);}
+				
+		//Apresenta resposta do servidor
+		printf("%s\n", serv_respmsg.resposta);
 			
+		//copia o path
+		path = getcwd(path,0);
+		
 			 
 	} while(1);
 			
