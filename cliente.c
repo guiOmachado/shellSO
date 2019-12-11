@@ -74,7 +74,8 @@ void main()
 		fflush(stdout);
 		
 		//copia o path
-		path = getcwd(path,0);       
+		path = getcwd(path,0);  
+		strcpy(cli_reqmsg.path,path);     
 
         //Define a mensagem inicial a ser exibida
         printf("~ %s : ",path);
@@ -90,13 +91,14 @@ void main()
 				scanf("%ld", &cli_id);
        	        scanf("%*c");	
 		}	
-		if(strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0){
+		if(strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0||strcmp(cli_reqmsg.comando,"run")==0||(cli_reqmsg.comando,"RUN")==0){
 			 printf("~ %s : Digite sua mensagem: ",path);
 				scanf("%[^\n]s",cli_reqmsg.texto_msg);
        	        scanf("%*c");
+		if(strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0){
 			printf("~ %s : Digite o id destino: ",path);
 				scanf("%ld",&cli_reqmsg.id_destino);
-       	        scanf("%*c");
+       	        scanf("%*c");}
 		}
 		//copia o id
 			cli_reqmsg.cli_id = cli_id;
@@ -106,7 +108,6 @@ void main()
             
 		// Espera pela mensagem de resposta especifica para este cliente
 		// usando o PID do processo cliente como tipo de mensagem
-			
 			
 		if (msgrcv(resp_mq,&serv_respmsg,sizeof(struct respmsg),cli_id,0) < 0){
 			printf("msgrcv falhou no cliente\n");

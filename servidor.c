@@ -33,6 +33,7 @@ struct reqmsg {
 	char caminho [MAX_TEXT_SIZE+1];
 	char texto_msg[MAX_TEXT_SIZE+1];	
 	long id_destino;
+	char aux[MAX_TEXT_SIZE+1];
 };
 //Struct para enviar
 struct respmsg {
@@ -44,6 +45,8 @@ struct respmsg {
 //Função da thread, thread que executa o comando 
 void *printMsg(struct reqmsg *cli_reqmsg) {
 	
+		
+		
 		if(strcmp(cli_reqmsg->comando,"dirlist")==0||strcmp(cli_reqmsg->comando,"DIRLIST")==0)
 		{
 			
@@ -55,7 +58,7 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		else if(strcmp(cli_reqmsg->comando,"myid")==0|| strcmp(cli_reqmsg->comando,"MYID")==0)
 		{ 
 			long x = cli_reqmsg->cli_id;
-			sprintf(cli_reqmsg->resposta_cli, "%ld", x);
+			sprintf(cli_reqmsg->resposta_cli, "\n~ %s : Seu id é: %ld", cli_reqmsg->path, x);
 			
 		} //mostra id do cliente
 		else if(strcmp(cli_reqmsg->comando,"godir")==0||strcmp(cli_reqmsg->comando,"GODIR")==0)
@@ -72,6 +75,13 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		}
 		else if(strcmp(cli_reqmsg->comando,"run")==0||strcmp(cli_reqmsg->comando,"RUN")==0)
 		{ 
+			
+			printf("\n\n%s\n\n", cli_reqmsg->aux);
+			long x = cli_reqmsg->cli_id;
+			sprintf(cli_reqmsg->resposta_cli, " gnome-terminal -e %s", cli_reqmsg->texto_msg);
+			system(cli_reqmsg->resposta_cli);
+			printf("\n\n%s\n\n", cli_reqmsg->resposta_cli);
+		
 			
 		}
 		else if(strcmp(cli_reqmsg->comando,"mail")==0||strcmp(cli_reqmsg->comando,"MAIL")==0)
@@ -96,7 +106,7 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		{ 
 			
 		}else{
-			strcpy(cli_reqmsg->resposta_cli,"Comando não encontrado!!\n");
+			sprintf(cli_reqmsg->resposta_cli,"~ %s : Comando não encontrado!!\n", cli_reqmsg->path);
 		}
 	   	
 	
