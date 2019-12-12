@@ -16,10 +16,8 @@
 //Struct para enviar
 struct reqmsg {
  	long cli_id;
-	long climensagem_id;
 	char resposta_cli[MAX_TEXT_SIZE+1]; 
    	char comando[MAX_TEXT_SIZE+1];
-	char mensagem_origem[MAX_TEXT_SIZE+1];
 	char path [MAX_TEXT_SIZE+1];
    	
 	
@@ -27,10 +25,39 @@ struct reqmsg {
 
 //Struct para receber
 struct respmsg {
-	long cli_id;	
+	long cli_id;
+	//char resposta_cli[MAX_TEXT_SIZE+1];
 	char resposta[MAX_TEXT_SIZE+1];
-	char mensagem_destino[MAX_TEXT_SIZE+1];
 };
+
+void leArquivo()	
+{
+  FILE *arq;
+  char Linha[100];
+  char *result;
+  int i;
+  //system("clear");
+  // Abre um arquivo TEXTO para LEITURA
+  arq = fopen("log.txt", "rt");
+  if (arq == NULL)  // Se houve erro na abertura
+  {
+     printf("Problemas na abertura do arquivo\n");
+     return;
+  }
+  i = 1;
+  while (!feof(arq))
+  {
+	// Lê uma linha (inclusive com o '\n')
+      result = fgets(Linha, 500, arq);  // o 'fgets' lê até 99 caracteres ou até o '\n'
+      //if (result)  // Se foi possível ler
+	  printf( "%s",Linha);
+      i++;
+  }
+  fclose(arq);  
+}
+
+
+
 void main()
 {
     //Definição de variáveis
@@ -72,17 +99,12 @@ void main()
         //Define a mensagem inicial a ser exibida
         printf("~ %s : ",path);
 		scanf("%[^\n]s",cli_reqmsg.comando);
-       	        scanf("%*c");	         
-	if(strcmp(cli_reqmsg.comando,"send")==0)
-	{
-		printf("~ %s : Digite o id de destino:  ",path);
-		scanf("%ld",&cli_reqmsg.climensagem_id);
-       	        scanf("%*c");
+       	        scanf("%*c");			
 		
-		printf("~ %s : Digite sua mensagem:  ",path);
-		scanf("%[^\n]s",cli_reqmsg.mensagem_origem);
-       	        scanf("%*c");
-	}	
+		
+		
+	         
+		
 			// Preenche o tipo da mensagem com o identificador (PID) do cliente
 			cli_reqmsg.cli_id = cli_id;
 
@@ -95,11 +117,10 @@ void main()
 				printf("msgrcv falhou no cliente\n");
 				exit(1);
 			}
-			// Apresenta a resposta do servidor
-
-		
-
-			printf("%s\n", serv_respmsg.resposta);	
+			// Apresenta o nome da thread e que ela finalizou de rodar no servidor
+			printf("%s\n", serv_respmsg.resposta);
+			
+			//leArquivo();
 			
 			path = getcwd(path,0);
 			

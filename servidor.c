@@ -17,7 +17,6 @@
 #include <pwd.h>
 #include <grp.h>
 #include <string.h>
-#include <signal.h> 
 
 
 
@@ -35,18 +34,14 @@ char concat[MAX_TEXT_SIZE+1];
 //Struct para receber
 struct reqmsg {
  	long cli_id;
-	long climensagem_id;
 	char resposta_cli[MAX_TEXT_SIZE+1];   	
     	char comando[MAX_TEXT_SIZE+1];
-	char mensagem_origem[MAX_TEXT_SIZE+1];
 	char path [MAX_TEXT_SIZE+1];	
 };
 //Struct para enviar
 struct respmsg {
 	long cli_id;
 	char resposta[MAX_TEXT_SIZE+1];
-	char mensagem_destino[MAX_TEXT_SIZE+1];
-	
 };
 
 
@@ -147,36 +142,26 @@ char * ls(char path[100])
 //Função da thread, thread que executa o comando 
 void *printMsg(struct reqmsg *cli_reqmsg) {
 
-		
-		
+		//"ls -l /home/gui/Desktop>log.txt"
+	
 		if(strcmp(cli_reqmsg->comando,"dirlist")==0)
 		{		
-			char *resposta_ls = ls(cli_reqmsg->path);
+
 			
-			strcpy(cli_reqmsg->resposta_cli,resposta_ls); 
+			char *teste = ls(cli_reqmsg->path);
+			
+			strcpy(cli_reqmsg->resposta_cli,teste);
+
+					
+ 
 		} 
 		else if(strcmp(cli_reqmsg->comando,"myid")==0)
-		{
-			char id[10];
-						 
-			//função para converter o id em char para passar como resposta			
-			snprintf(id, 6, "%ld", cli_reqmsg->cli_id);
-			
-			strcpy(cli_reqmsg->resposta_cli,id);
-		}
-		else if(strcmp(cli_reqmsg->comando,"send")==0)
-		{			 
-				
-
-		} 			
+		{ 
+			printf("MYID: %ld\n", cli_reqmsg->cli_id);
+		} //mostra id do cliente			
 		else if(strcmp(cli_reqmsg->comando,"exit")==0)
-		{
-			//mata o processo do cliente do id enviado 
-			kill(cli_reqmsg->cli_id, SIGINT);
-		}
-		else// caso o comando nao exista ele diz que nao encontrou o comando
-		{
-			strcpy(cli_reqmsg->resposta_cli,"Comando não encontrado");
+		{ 
+			exit(0);
 		}
 	   	
 	
@@ -225,9 +210,6 @@ void main()
 
 		// Copia o nome para a mensagem de resposta
 		strcpy(serv_respmsg.resposta,cli_reqmsg.resposta_cli);
-
-		("mensagem: %s /// id de destino: %ld ", cli_reqmsg.mensagem_origem, cli_reqmsg.climensagem_id);	
-
 
 		// Envia a resposta ao cliente
 		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
