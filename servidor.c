@@ -18,6 +18,7 @@
 #include <grp.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <signal.h> 
 
 #define _XOPEN_SOURCE_EXTENDED 1
 #define REQ_QUEUE 	10010
@@ -47,7 +48,13 @@ struct respmsg {
 };
 char * ls(char path[100])
 {
+<<<<<<< HEAD
 		  memset (&concat, 0, sizeof (concat) );
+=======
+
+		  memset (&concat, 0, sizeof (concat) );
+
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 		  struct passwd *pw;
 		  struct group *gp;
 		  DIR *mydir;
@@ -57,6 +64,7 @@ char * ls(char path[100])
 		  struct stat fileStat;
 		  mydir=opendir(path);
 		  stat(".",&fileStat);
+<<<<<<< HEAD
 
  	 while((myfile=readdir(mydir))!=NULL)
  	{
@@ -77,6 +85,43 @@ char * ls(char path[100])
 				pw=getpwuid(fileStat.st_uid);
 		    	gp=getgrgid(fileStat.st_gid);			   
 			    strcat(concat,stat1);
+=======
+
+
+
+
+ 	 while((myfile=readdir(mydir))!=NULL)
+ 	{
+		char 		stat1[MAX_TEXT_SIZE+1],stat2[MAX_TEXT_SIZE+1],stat3[MAX_TEXT_SIZE+1],stat4[MAX_TEXT_SIZE+1],stat5[MAX_TEXT_SIZE+1],stat6[MAX_TEXT_SIZE+1],stat7[MAX_TEXT_SIZE+1],stat8[MAX_TEXT_SIZE+1],stat9[MAX_TEXT_SIZE+1],stat10[MAX_TEXT_SIZE+1],stat11[MAX_TEXT_SIZE+1];
+
+
+
+			if(strcmp(myfile->d_name,".") != 0 && strcmp(myfile->d_name,"..") != 0)
+			{
+
+			    //pegando variaveis 
+			     stat(myfile->d_name,&fileStat);  
+			     strcpy(stat1,(S_ISDIR(fileStat.st_mode)) ? "d" : "-");
+			     strcpy(stat2,(fileStat.st_mode & S_IRUSR) ? "r" : "-");		    
+			     strcpy(stat3,(fileStat.st_mode & S_IWUSR) ? "w" : "-");
+			     strcpy(stat4,(fileStat.st_mode & S_IXUSR) ? "x" : "-");
+			     strcpy(stat5,(fileStat.st_mode & S_IRGRP) ? "r" : "-");
+			     strcpy(stat6,(fileStat.st_mode & S_IWGRP) ? "w" : "-");
+			     strcpy(stat7,(fileStat.st_mode & S_IXGRP) ? "x" : "-");
+			     strcpy(stat8,(fileStat.st_mode & S_IROTH) ? "r" : "-");
+			     strcpy(stat9,(fileStat.st_mode & S_IWOTH) ? "w" : "-");
+			     strcpy(stat10,(fileStat.st_mode & S_IXOTH) ? "x" : "-"); 
+
+			    	//strcpy(stat11,fileStat.st_nlink);
+
+				pw=getpwuid(fileStat.st_uid);
+
+			    	gp=getgrgid(fileStat.st_gid);			   
+
+			    	//c=ctime(&fileStat.st_mtime);
+
+			    	strcat(concat,stat1);
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 				strcat(concat,stat2);
 				strcat(concat,stat3);
 				strcat(concat,stat4);
@@ -89,12 +134,37 @@ char * ls(char path[100])
 				strcat(concat," ");
 				strcat(concat,gp->gr_name);
 				strcat(concat," ");
+<<<<<<< HEAD
 				strcat(concat,pw->pw_name);
 				strcat(concat," ");
 				strcat(concat,myfile->d_name);				
 				strcat(concat,"\n");		
 			}
 	}
+=======
+				//for(i=4;i<=15;i++)
+				//{
+					//char str[10];
+					//sprintf(str, "%i", c[i]);
+				      	//strcat(concat,str);
+				//}
+				strcat(concat,pw->pw_name);
+				strcat(concat," ");
+				strcat(concat,myfile->d_name);				
+				strcat(concat,"\n");
+
+				//strcat(concat,stat11);
+				//strcat(concat,pw);
+				//strcat(concat,gp);
+				//strcat(concat,c);		
+
+			}		
+
+	}
+
+
+
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
   closedir(mydir);  
   return concat;
 }
@@ -108,6 +178,12 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			char *teste = ls(cli_reqmsg->path);
 			strcpy(cli_reqmsg->resposta_cli,teste);
 			
+<<<<<<< HEAD
+=======
+		} else if (strcmp(cli_reqmsg->comando,"clear")==0|| strcmp(cli_reqmsg->comando,"CLEAR")==0)
+		{
+			strcpy(cli_reqmsg->resposta_cli, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n=================================================================\n================SHELL SISTOPERACIONAIS INICIOU===================\n===============DIGITE HELP PARA VER OS COMANDOS==================\n============APERTE ENTER PARA EXECUTAR OS COMANADOS==============\n=================================================================\n");
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 		}
 		else if(strcmp(cli_reqmsg->comando,"myid")==0|| strcmp(cli_reqmsg->comando,"MYID")==0)
 		{ 
@@ -120,18 +196,35 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			
 		}			
 		else if(strcmp(cli_reqmsg->comando,"exit")==0 || strcmp(cli_reqmsg->comando,"EXIT")==0)
+<<<<<<< HEAD
 		{ 
 			int i;
 			for(i=0;i<10;i++)
 			{ 
 
+=======
+		{
+			int i;
+			for(i=0;i<10;i++)
+			{ 
+				
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 				if(users[i]==cli_reqmsg->cli_id)
 				{
 					users[i]=0;
 				}	
+<<<<<<< HEAD
 			}
 
 			strcpy(cli_reqmsg->resposta_cli,"Cliente deslogado");	
+=======
+			        	
+				
+			}
+			
+			strcpy(cli_reqmsg->resposta_cli,"Cliente deslogado");				
+ 
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 			kill(cli_reqmsg->cli_id, SIGINT);
 		}
 		else if(strcmp(cli_reqmsg->comando,"help")==0||strcmp(cli_reqmsg->comando,"HELP")==0)
@@ -140,6 +233,7 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		}
 		else if(strcmp(cli_reqmsg->comando,"run")==0||strcmp(cli_reqmsg->comando,"RUN")==0)
 		{ 
+<<<<<<< HEAD
 			char resp[MAX_TEXT_SIZE+1];
 			sprintf(resp, " gnome-terminal -x %s", cli_reqmsg->texto_msg);
 			sprintf(cli_reqmsg->resposta_cli,"\n~ %s : Executado com sucesso!!\n", cli_reqmsg->path);
@@ -148,6 +242,23 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		else if(strcmp(cli_reqmsg->comando,"mail")==0||strcmp(cli_reqmsg->comando,"MAIL")==0)
 		{ 	
 			sprintf(cli_reqmsg->resposta_cli,"\n~ %s: Mensagem enviada!!\n", cli_reqmsg->path);
+=======
+			
+			printf("\n\n%s\n\n", cli_reqmsg->aux);
+			long x = cli_reqmsg->cli_id;
+			sprintf(cli_reqmsg->resposta_cli, " gnome-terminal -e %s", cli_reqmsg->texto_msg);
+			system(cli_reqmsg->resposta_cli);
+			printf("\n\n%s\n\n", cli_reqmsg->resposta_cli);
+			
+		}
+		else if(strcmp(cli_reqmsg->comando,"mail")==0||strcmp(cli_reqmsg->comando,"MAIL")==0)
+		{ 	
+		
+		}
+		else if(strcmp(cli_reqmsg->comando,"showmail")==0||strcmp(cli_reqmsg->comando,"SHOWMAIL")==0)
+		{ 
+			
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 		}
 		else if(strcmp(cli_reqmsg->comando,"showmail")==0||strcmp(cli_reqmsg->comando,"SHOWMAIL")==0){	sprintf(cli_reqmsg->resposta_cli,"\n~ %s: OK!!\n", cli_reqmsg->path);}
 		else if(strcmp(cli_reqmsg->comando,"send")==0||strcmp(cli_reqmsg->comando,"SEND")==0)
@@ -176,44 +287,88 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		}
 		else if(strcmp(cli_reqmsg->comando,"login")==0||strcmp(cli_reqmsg->comando,"LOGIN")==0)
 		{
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 			int login=0;
 			int i;
 			for(i=0;i<10;i++)
 			{ 
+<<<<<<< HEAD
+=======
+				
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 				if(users[i]==cli_reqmsg->cli_id)
 				{
 					strcpy(cli_reqmsg->resposta_cli,"O usuário ja esta logado!!\n");
 					login=1;
 					break;
 				}	
+<<<<<<< HEAD
 			}
 			if(login==0)
 			{
 				users[posUser] = cli_reqmsg->cli_id;
 				sprintf(cli_reqmsg->resposta_cli,"\n~ %s: Logado seu id é %ld\n", cli_reqmsg->path, cli_reqmsg->cli_id);
+=======
+			        	
+				
+			}
+
+			if(login==0)
+			{
+				users[posUser] = cli_reqmsg->cli_id;
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 				posUser++; 
 			}
 		}
 		else if(strcmp(cli_reqmsg->comando,"users")==0||strcmp(cli_reqmsg->comando,"USERS")==0)
+<<<<<<< HEAD
 		{ 
 			int i=0;
 			char usersLogados[MAX_TEXT_SIZE+1];
 			char concatena[MAX_TEXT_SIZE+1];
 
 			strcpy(concatena,"Users logados: \n");
+=======
+		{
+			int i=0;
+			char usersLogados[MAX_TEXT_SIZE+1];
+			char concatena[MAX_TEXT_SIZE+1];
+			
+			strcat(concatena,"     Users logados: \n");
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 			for(i=0;i<10;i++)
 			{ 
 				if(users[i]!=0)
 				{
+<<<<<<< HEAD
+=======
+					
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 					snprintf( usersLogados, MAX_TEXT_SIZE+1 , "%d", users[i] );
 					strcat(concatena,usersLogados);
 					strcat(concatena,"\n");
 				}
+<<<<<<< HEAD
 			}
 			strcpy(cli_reqmsg->resposta_cli,"");
 			strcpy(cli_reqmsg->resposta_cli,concatena);
 			memset (&concatena, 0, sizeof (concatena));
+=======
+
+			        	
+				if(users[i]!=0)
+				printf("          Users: %d \n", users[i]);
+			}
+
+			
+			strcpy(cli_reqmsg->resposta_cli,concatena);
+			 memset (&concatena, 0, sizeof (concatena) );
+			
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 		}else{
 			sprintf(cli_reqmsg->resposta_cli,"~ %s : Comando não encontrado!!\n", cli_reqmsg->path);
 		}
@@ -264,6 +419,7 @@ void main()
 		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
 		printf("servidor: enviou resposta ao cliente %ld\n",serv_respmsg.cli_id);
 
+<<<<<<< HEAD
 	if (strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0||strcmp(cli_reqmsg.comando,"mail")==0||strcmp(cli_reqmsg.comando,"MAIL")==0)
 	{
 		char teste[MAX_TEXT_SIZE+1];
@@ -272,6 +428,17 @@ void main()
 		strcpy(serv_respmsg.resposta,teste);
 		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
 	}
+=======
+	if (strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0)
+	{
+		serv_respmsg.cli_id = cli_reqmsg.id_destino;
+		strcpy(serv_respmsg.resposta,cli_reqmsg.texto_msg);
+		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
+	}
+
+		
+
+>>>>>>> f81d51652243964d066b67b71a83c44e98dfb5d4
 	}
 
 	exit(0);	
