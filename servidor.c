@@ -26,6 +26,8 @@
 #define MAX_TEXT_SIZE 	1000
 
 char concat[MAX_TEXT_SIZE+1];
+int  posUser=0;
+int  users[MAX_TEXT_SIZE+1];
 
 //Struct para receber
 struct reqmsg {
@@ -154,7 +156,21 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			
 		}			
 		else if(strcmp(cli_reqmsg->comando,"exit")==0 || strcmp(cli_reqmsg->comando,"EXIT")==0)
-		{ 
+		{
+			int i;
+			for(i=0;i<10;i++)
+			{ 
+				
+				if(users[i]==cli_reqmsg->cli_id)
+				{
+					users[i]=0;
+				}	
+			        	
+				
+			}
+			
+			strcpy(cli_reqmsg->resposta_cli,"Cliente deslogado");				
+ 
 			kill(cli_reqmsg->cli_id, SIGINT);
 		}
 		else if(strcmp(cli_reqmsg->comando,"help")==0||strcmp(cli_reqmsg->comando,"HELP")==0)
@@ -188,8 +204,55 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		{ 
 			
 		}
+		else if(strcmp(cli_reqmsg->comando,"login")==0||strcmp(cli_reqmsg->comando,"LOGIN")==0)
+		{
+	
+			int login=0;
+			int i;
+			for(i=0;i<10;i++)
+			{ 
+				
+				if(users[i]==cli_reqmsg->cli_id)
+				{
+					strcpy(cli_reqmsg->resposta_cli,"O usuário ja esta logado!!\n");
+					login=1;
+					break;
+				}	
+			        	
+				
+			}
+
+			if(login==0)
+			{
+				users[posUser] = cli_reqmsg->cli_id;
+				posUser++; 
+			}
+		}
 		else if(strcmp(cli_reqmsg->comando,"users")==0||strcmp(cli_reqmsg->comando,"USERS")==0)
-		{ 
+		{
+			int i=0;
+			char usersLogados[MAX_TEXT_SIZE+1];
+			char concatena[MAX_TEXT_SIZE+1];
+			
+			strcat(concatena,"     Users logados: \n");
+			for(i=0;i<10;i++)
+			{ 
+				if(users[i]!=0)
+				{
+					
+					snprintf( usersLogados, MAX_TEXT_SIZE+1 , "%d", users[i] );
+					strcat(concatena,usersLogados);
+					strcat(concatena,"\n");
+				}
+
+			        	
+				if(users[i]!=0)
+				printf("          Users: %d \n", users[i]);
+			}
+
+			
+			strcpy(cli_reqmsg->resposta_cli,concatena);
+			 memset (&concatena, 0, sizeof (concatena) );
 			
 		}else{
 			sprintf(cli_reqmsg->resposta_cli,"~ %s : Comando não encontrado!!\n", cli_reqmsg->path);
