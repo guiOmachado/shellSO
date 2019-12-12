@@ -24,6 +24,8 @@
 #define RESP_QUEUE 	10020
 #define MAX_TEXT_SIZE 	1000
 
+char concat[MAX_TEXT_SIZE+1];
+
 //Struct para receber
 struct reqmsg {
  	long cli_id;
@@ -40,7 +42,92 @@ struct respmsg {
 	long cli_id;
 	char resposta[MAX_TEXT_SIZE+1];
 };
+char * ls(char path[100])
+{
 
+		  memset (&concat, 0, sizeof (concat) );
+
+		  struct passwd *pw;
+		  struct group *gp;
+		  DIR *mydir;
+		  char *c;		  
+		  int i,linhaLs;
+		  struct dirent *myfile;
+		  struct stat fileStat;
+		  mydir=opendir(path);
+		  stat(".",&fileStat);
+
+
+
+
+ 	 while((myfile=readdir(mydir))!=NULL)
+ 	{
+		char 		stat1[MAX_TEXT_SIZE+1],stat2[MAX_TEXT_SIZE+1],stat3[MAX_TEXT_SIZE+1],stat4[MAX_TEXT_SIZE+1],stat5[MAX_TEXT_SIZE+1],stat6[MAX_TEXT_SIZE+1],stat7[MAX_TEXT_SIZE+1],stat8[MAX_TEXT_SIZE+1],stat9[MAX_TEXT_SIZE+1],stat10[MAX_TEXT_SIZE+1],stat11[MAX_TEXT_SIZE+1];
+
+
+
+			if(strcmp(myfile->d_name,".") != 0 && strcmp(myfile->d_name,"..") != 0)
+			{
+
+			    //pegando variaveis 
+			     stat(myfile->d_name,&fileStat);  
+			     strcpy(stat1,(S_ISDIR(fileStat.st_mode)) ? "d" : "-");
+			     strcpy(stat2,(fileStat.st_mode & S_IRUSR) ? "r" : "-");		    
+			     strcpy(stat3,(fileStat.st_mode & S_IWUSR) ? "w" : "-");
+			     strcpy(stat4,(fileStat.st_mode & S_IXUSR) ? "x" : "-");
+			     strcpy(stat5,(fileStat.st_mode & S_IRGRP) ? "r" : "-");
+			     strcpy(stat6,(fileStat.st_mode & S_IWGRP) ? "w" : "-");
+			     strcpy(stat7,(fileStat.st_mode & S_IXGRP) ? "x" : "-");
+			     strcpy(stat8,(fileStat.st_mode & S_IROTH) ? "r" : "-");
+			     strcpy(stat9,(fileStat.st_mode & S_IWOTH) ? "w" : "-");
+			     strcpy(stat10,(fileStat.st_mode & S_IXOTH) ? "x" : "-"); 
+
+			    	//strcpy(stat11,fileStat.st_nlink);
+
+				pw=getpwuid(fileStat.st_uid);
+
+			    	gp=getgrgid(fileStat.st_gid);			   
+
+			    	//c=ctime(&fileStat.st_mtime);
+
+			    	strcat(concat,stat1);
+				strcat(concat,stat2);
+				strcat(concat,stat3);
+				strcat(concat,stat4);
+				strcat(concat,stat5);
+				strcat(concat,stat6);
+				strcat(concat,stat7);
+				strcat(concat,stat8);
+				strcat(concat,stat9);
+				strcat(concat,stat10);
+				strcat(concat," ");
+				strcat(concat,gp->gr_name);
+				strcat(concat," ");
+				//for(i=4;i<=15;i++)
+				//{
+					//char str[10];
+					//sprintf(str, "%i", c[i]);
+				      	//strcat(concat,str);
+				//}
+				strcat(concat,pw->pw_name);
+				strcat(concat," ");
+				strcat(concat,myfile->d_name);				
+				strcat(concat,"\n");
+
+				//strcat(concat,stat11);
+				//strcat(concat,pw);
+				//strcat(concat,gp);
+				//strcat(concat,c);		
+
+			}		
+
+	}
+
+
+
+  closedir(mydir);  
+  return concat;
+}
 
 //Função da thread, thread que executa o comando 
 void *printMsg(struct reqmsg *cli_reqmsg) {
@@ -48,7 +135,8 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		
 		if(strcmp(cli_reqmsg->comando,"dirlist")==0||strcmp(cli_reqmsg->comando,"DIRLIST")==0)
 		{
-			
+			char *teste = ls(cli_reqmsg->path);
+			strcpy(cli_reqmsg->resposta_cli,teste);
 			
 		} else if (strcmp(cli_reqmsg->comando,"clear")==0|| strcmp(cli_reqmsg->comando,"CLEAR")==0)
 		{
