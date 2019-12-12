@@ -18,6 +18,7 @@
 #include <grp.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <signal.h> 
 
 #define _XOPEN_SOURCE_EXTENDED 1
 #define REQ_QUEUE 	10010
@@ -154,7 +155,7 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		}			
 		else if(strcmp(cli_reqmsg->comando,"exit")==0 || strcmp(cli_reqmsg->comando,"EXIT")==0)
 		{ 
-			exit(0);
+			kill(cli_reqmsg->cli_id, SIGINT);
 		}
 		else if(strcmp(cli_reqmsg->comando,"help")==0||strcmp(cli_reqmsg->comando,"HELP")==0)
 		{ 
