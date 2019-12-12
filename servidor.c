@@ -17,96 +17,166 @@
 #include <pwd.h>
 #include <grp.h>
 #include <string.h>
-#include <sys/socket.h>
+#include <signal.h> 
 
-#define _XOPEN_SOURCE_EXTENDED 1
+
+
+
 #define REQ_QUEUE 	10010
 #define RESP_QUEUE 	10020
 #define MAX_TEXT_SIZE 	1000
 
+
+
+
+char concat[MAX_TEXT_SIZE+1];
+
+
 //Struct para receber
 struct reqmsg {
  	long cli_id;
-	char resposta_cli[MAX_TEXT_SIZE+1];   
-	char comando[MAX_TEXT_SIZE+1];
+	long climensagem_id;
+	char resposta_cli[MAX_TEXT_SIZE+1];   	
+    	char comando[MAX_TEXT_SIZE+1];
+	char mensagem_origem[MAX_TEXT_SIZE+1];
 	char path [MAX_TEXT_SIZE+1];	
-	char caminho [MAX_TEXT_SIZE+1];
-	char texto_msg[MAX_TEXT_SIZE+1];	
-	long id_destino;
-	char aux[MAX_TEXT_SIZE+1];
 };
 //Struct para enviar
 struct respmsg {
 	long cli_id;
 	char resposta[MAX_TEXT_SIZE+1];
+	char mensagem_destino[MAX_TEXT_SIZE+1];
+	
 };
+
+
+
+char * ls(char path[100])
+{
+
+		  memset (&concat, 0, sizeof (concat) );
+			
+		  struct passwd *pw;
+		  struct group *gp;
+		  DIR *mydir;
+		  char *c;		  
+		  int i,linhaLs;
+		  struct dirent *myfile;
+		  struct stat fileStat;
+		  mydir=opendir(path);
+		  stat(".",&fileStat);
+		  	
+
+		  
+
+ 	 while((myfile=readdir(mydir))!=NULL)
+ 	{
+		char 		stat1[MAX_TEXT_SIZE+1],stat2[MAX_TEXT_SIZE+1],stat3[MAX_TEXT_SIZE+1],stat4[MAX_TEXT_SIZE+1],stat5[MAX_TEXT_SIZE+1],stat6[MAX_TEXT_SIZE+1],stat7[MAX_TEXT_SIZE+1],stat8[MAX_TEXT_SIZE+1],stat9[MAX_TEXT_SIZE+1],stat10[MAX_TEXT_SIZE+1],stat11[MAX_TEXT_SIZE+1];
+		   
+		
+		
+			if(strcmp(myfile->d_name,".") != 0 && strcmp(myfile->d_name,"..") != 0)
+			{
+ 			  
+			    //pegando variaveis 
+			     stat(myfile->d_name,&fileStat);  
+			     strcpy(stat1,(S_ISDIR(fileStat.st_mode)) ? "d" : "-");
+			     strcpy(stat2,(fileStat.st_mode & S_IRUSR) ? "r" : "-");		    
+			     strcpy(stat3,(fileStat.st_mode & S_IWUSR) ? "w" : "-");
+			     strcpy(stat4,(fileStat.st_mode & S_IXUSR) ? "x" : "-");
+			     strcpy(stat5,(fileStat.st_mode & S_IRGRP) ? "r" : "-");
+			     strcpy(stat6,(fileStat.st_mode & S_IWGRP) ? "w" : "-");
+			     strcpy(stat7,(fileStat.st_mode & S_IXGRP) ? "x" : "-");
+			     strcpy(stat8,(fileStat.st_mode & S_IROTH) ? "r" : "-");
+			     strcpy(stat9,(fileStat.st_mode & S_IWOTH) ? "w" : "-");
+			     strcpy(stat10,(fileStat.st_mode & S_IXOTH) ? "x" : "-"); 
+			    
+			    	//strcpy(stat11,fileStat.st_nlink);
+			    	
+				pw=getpwuid(fileStat.st_uid);
+			    
+			    	gp=getgrgid(fileStat.st_gid);			   
+			   
+			    	//c=ctime(&fileStat.st_mtime);
+			    	
+			    	strcat(concat,stat1);
+				strcat(concat,stat2);
+				strcat(concat,stat3);
+				strcat(concat,stat4);
+				strcat(concat,stat5);
+				strcat(concat,stat6);
+				strcat(concat,stat7);
+				strcat(concat,stat8);
+				strcat(concat,stat9);
+				strcat(concat,stat10);
+				strcat(concat," ");
+				strcat(concat,gp->gr_name);
+				strcat(concat," ");
+				//for(i=4;i<=15;i++)
+				//{
+					//char str[10];
+					//sprintf(str, "%i", c[i]);
+				      	//strcat(concat,str);
+				//}
+				strcat(concat,pw->pw_name);
+				strcat(concat," ");
+				strcat(concat,myfile->d_name);				
+				strcat(concat,"\n");
+				
+				//strcat(concat,stat11);
+				//strcat(concat,pw);
+				//strcat(concat,gp);
+				//strcat(concat,c);		
+			   
+			}		
+		
+	}
+
+	
+
+  closedir(mydir);  
+  return concat;
+}
+
+
+
+
+
 
 
 //Função da thread, thread que executa o comando 
 void *printMsg(struct reqmsg *cli_reqmsg) {
-	
-		
-		
-		if(strcmp(cli_reqmsg->comando,"dirlist")==0||strcmp(cli_reqmsg->comando,"DIRLIST")==0)
-		{
-			
-			
-		} else if (strcmp(cli_reqmsg->comando,"clear")==0|| strcmp(cli_reqmsg->comando,"CLEAR")==0)
-		{
-			strcpy(cli_reqmsg->resposta_cli, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n=================================================================\n================SHELL SISTOPERACIONAIS INICIOU===================\n===============DIGITE HELP PARA VER OS COMANDOS==================\n============APERTE ENTER PARA EXECUTAR OS COMANADOS==============\n=================================================================\n");
-		}
-		else if(strcmp(cli_reqmsg->comando,"myid")==0|| strcmp(cli_reqmsg->comando,"MYID")==0)
-		{ 
-			long x = cli_reqmsg->cli_id;
-			sprintf(cli_reqmsg->resposta_cli, "\n~ %s : Seu id é: %ld", cli_reqmsg->path, x);
-			
-		} //mostra id do cliente
-		else if(strcmp(cli_reqmsg->comando,"godir")==0||strcmp(cli_reqmsg->comando,"GODIR")==0)
-		{ 
-			
-		}			
-		else if(strcmp(cli_reqmsg->comando,"exit")==0 || strcmp(cli_reqmsg->comando,"EXIT")==0)
-		{ 
-			exit(0);
-		}
-		else if(strcmp(cli_reqmsg->comando,"help")==0||strcmp(cli_reqmsg->comando,"HELP")==0)
-		{ 
-			strcpy(cli_reqmsg->resposta_cli,"DIRLIST: Lista os diretórios\nMYID: Mostra seu ID\nGODIR: Vai para o diretório desejado\nRUN: Roda a aplicação\nEXIT: Faz o logoff\nMAIL: Envia a mensagem de e-mail\nSHOWMAIL: Mostra todas as mensagens de e-mails recebidas\nSEND: Envia uma mensagem direta ao usuário destino\nRECEIVE: Retira e mostra na tela uma mensagem (se houver) da fila de mensagens\nUSERS: Mostra na tela a lista de usuários correntemente logados no sistema\nCLEAR: Limpa a tela\n");
-		}
-		else if(strcmp(cli_reqmsg->comando,"run")==0||strcmp(cli_reqmsg->comando,"RUN")==0)
-		{ 
-			
-			printf("\n\n%s\n\n", cli_reqmsg->aux);
-			long x = cli_reqmsg->cli_id;
-			sprintf(cli_reqmsg->resposta_cli, " gnome-terminal -e %s", cli_reqmsg->texto_msg);
-			system(cli_reqmsg->resposta_cli);
-			printf("\n\n%s\n\n", cli_reqmsg->resposta_cli);
-		
-			
-		}
-		else if(strcmp(cli_reqmsg->comando,"mail")==0||strcmp(cli_reqmsg->comando,"MAIL")==0)
-		{ 	
-		
-			
-		}
-		else if(strcmp(cli_reqmsg->comando,"showmail")==0||strcmp(cli_reqmsg->comando,"SHOWMAIL")==0)
-		{ 
-			
-		}
-		else if(strcmp(cli_reqmsg->comando,"send")==0||strcmp(cli_reqmsg->comando,"SEND")==0)
-		{ 
-			strcpy(cli_reqmsg->resposta_cli,"Mensagem enviada!!\n");
 
-		}
-		else if(strcmp(cli_reqmsg->comando,"receive")==0||strcmp(cli_reqmsg->comando,"RECEIVE")==0)
-		{ 
+		
+		
+		if(strcmp(cli_reqmsg->comando,"dirlist")==0)
+		{		
+			char *resposta_ls = ls(cli_reqmsg->path);
 			
-		}
-		else if(strcmp(cli_reqmsg->comando,"users")==0||strcmp(cli_reqmsg->comando,"USERS")==0)
-		{ 
+			strcpy(cli_reqmsg->resposta_cli,resposta_ls); 
+		} 
+		else if(strcmp(cli_reqmsg->comando,"myid")==0)
+		{
+			char id[10];
+						 
+			//função para converter o id em char para passar como resposta			
+			snprintf(id, 6, "%ld", cli_reqmsg->cli_id);
 			
-		}else{
-			sprintf(cli_reqmsg->resposta_cli,"~ %s : Comando não encontrado!!\n", cli_reqmsg->path);
+			strcpy(cli_reqmsg->resposta_cli,id);
+		}
+		else if(strcmp(cli_reqmsg->comando,"send")==0)
+		{			 
+				
+
+		} 			
+		else if(strcmp(cli_reqmsg->comando,"exit")==0)
+		{
+			//mata o processo do cliente do id enviado 
+			kill(cli_reqmsg->cli_id, SIGINT);
+		}
+		else// caso o comando nao exista ele diz que nao encontrou o comando
+		{
+			strcpy(cli_reqmsg->resposta_cli,"Comando não encontrado");
 		}
 	   	
 	
@@ -142,30 +212,26 @@ void main()
 
 		printf("servidor: recebeu requisicao do cliente %ld\n",cli_reqmsg.cli_id);
 		
+		
 		// Cria a thread requerida
+			printf("criando nova thread %s \n", cli_reqmsg.comando);
 			pthread_t thread;
 			pthread_create(&thread, NULL, (void *)printMsg, &cli_reqmsg);
 			pthread_join(thread, NULL);	
 
+
 		// Copia o identificador do cliente para a mensagem de resposta
 		serv_respmsg.cli_id = cli_reqmsg.cli_id;
 
-		
 		// Copia o nome para a mensagem de resposta
 		strcpy(serv_respmsg.resposta,cli_reqmsg.resposta_cli);
+
+		("mensagem: %s /// id de destino: %ld ", cli_reqmsg.mensagem_origem, cli_reqmsg.climensagem_id);	
+
+
 		// Envia a resposta ao cliente
 		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
 		printf("servidor: enviou resposta ao cliente %ld\n",serv_respmsg.cli_id);
-
-if (strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0)
-{
-	serv_respmsg.cli_id = cli_reqmsg.id_destino;
-	strcpy(serv_respmsg.resposta,cli_reqmsg.texto_msg);
-	msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
-}
-
-		
-
 	}
 
 	exit(0);	
