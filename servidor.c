@@ -45,6 +45,7 @@ struct respmsg {
 	long cli_id;
 	char resposta[MAX_TEXT_SIZE+1];
 };
+
 char * ls(char path[100])
 {
 		  memset (&concat, 0, sizeof (concat) );
@@ -102,6 +103,47 @@ char * ls(char path[100])
 //Função da thread, thread que executa o comando 
 void *printMsg(struct reqmsg *cli_reqmsg) {
 
+		    
+		    	
+		    char str1[MAX_TEXT_SIZE+1];
+		    char newString[10][10]; 
+		    int i=0,j,ctr;		       
+		 		
+			strcpy(str1,&cli_reqmsg->comando);
+		
+   		 
+		    j=0; ctr=0;
+		    while(i<=(strlen(str1)))
+		    {
+			// if space or NULL found, assign NULL into newString[ctr]
+			
+			
+			if(str1[i]==' '||str1[i]=='\0')
+			{
+			    newString[ctr][j]='\0';
+			    ctr++;  //for next word
+			    j=0;    //for next word, init index to 0
+
+			
+			}
+			else
+			{
+			    newString[ctr][j]=str1[i];
+			    j++;
+			}
+			i++;
+		    }
+		   
+		    for(i=0;i < ctr;i++)
+			printf(" %s\n",newString[i]);
+			
+		   
+		
+	
+		strcpy(&cli_reqmsg->comando,newString[0]);
+		
+
+
 		
 		if(strcmp(cli_reqmsg->comando,"dirlist")==0||strcmp(cli_reqmsg->comando,"DIRLIST")==0)
 		{
@@ -111,8 +153,8 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		}
 		else if(strcmp(cli_reqmsg->comando,"myid")==0|| strcmp(cli_reqmsg->comando,"MYID")==0)
 		{ 
-			long x = cli_reqmsg->cli_id;
-			sprintf(cli_reqmsg->resposta_cli, "\n~ %s : Seu id é: %ld", cli_reqmsg->path, x);
+			long id = cli_reqmsg->cli_id;
+			sprintf(cli_reqmsg->resposta_cli, "\n~ %s : Seu id é: %ld", cli_reqmsg->path, id);
 			
 		} //mostra id do cliente
 		else if(strcmp(cli_reqmsg->comando,"godir")==0||strcmp(cli_reqmsg->comando,"GODIR")==0)
@@ -122,41 +164,51 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		else if(strcmp(cli_reqmsg->comando,"exit")==0 || strcmp(cli_reqmsg->comando,"EXIT")==0)
 		{ 
 			int i;
-			for(i=0;i<10;i++)
-			{if(users[i]==cli_reqmsg->cli_id){
+			for(i=0;i<MAX_TEXT_SIZE+1;i++)
+			{ 
+
+				if(users[i]==cli_reqmsg->cli_id)
+				{
 					users[i]=0;
+					strcpy(cli_reqmsg->resposta_cli,"Cliente deslogado");
 				}	
 			}
 
-			strcpy(cli_reqmsg->resposta_cli, "Cliente deslogado");	
+				
 			kill(cli_reqmsg->cli_id, SIGINT);
 		}
 		else if(strcmp(cli_reqmsg->comando,"help")==0||strcmp(cli_reqmsg->comando,"HELP")==0)
 		{ 
 			strcpy(cli_reqmsg->resposta_cli,"DIRLIST: Lista os diretórios\nMYID: Mostra seu ID\nGODIR: Vai para o diretório desejado\nRUN: Roda a aplicação\nEXIT: Faz o logoff\nMAIL: Envia a mensagem de e-mail\nSHOWMAIL: Mostra todas as mensagens de e-mails recebidas\nSEND: Envia uma mensagem direta ao usuário destino\nRECEIVE: Retira e mostra na tela uma mensagem (se houver) da fila de mensagens\nUSERS: Mostra na tela a lista de usuários correntemente logados no sistema\nCLEAR: Limpa a tela\n");
-		}
-		else if(strcmp(cli_reqmsg->comando,"run")==0||strcmp(cli_reqmsg->comando,"RUN")==0)
-		{ 
-			char resp[MAX_TEXT_SIZE+1];
-			sprintf(resp, " gnome-terminal -x %s", cli_reqmsg->texto_msg);
-			sprintf(cli_reqmsg->resposta_cli,"\n~ %s : Executado com sucesso!!\n", cli_reqmsg->path);
-			system(resp);
-		}
+		}		
 		else if(strcmp(cli_reqmsg->comando,"mail")==0||strcmp(cli_reqmsg->comando,"MAIL")==0)
 		{ 	
 			sprintf(cli_reqmsg->resposta_cli,"\n~ %s: Mensagem enviada!!\n", cli_reqmsg->path);
+
+			cli_reqmsg->id_destino=atol(newString[1]);
+			strcpy(&cli_reqmsg->texto_msg,newString[2]);
+			for(i=3;i < ctr;i++){
+			strcat(&cli_reqmsg->texto_msg," ");
+			strcat(&cli_reqmsg->texto_msg,newString[i]);}
+			
+
 		}
-		else if(strcmp(cli_reqmsg->comando,"showmail")==0||strcmp(cli_reqmsg->comando,"SHOWMAIL")==0){}
+		else if(strcmp(cli_reqmsg->comando,"showmail")==0||strcmp(cli_reqmsg->comando,"SHOWMAIL")==0){	}//sprintf(cli_reqmsg->resposta_cli,"\n~ %s: OK!!\n", cli_reqmsg->path);}
 		else if(strcmp(cli_reqmsg->comando,"send")==0||strcmp(cli_reqmsg->comando,"SEND")==0)
 		{ 
 			int login=0;
 			int i;
-			for(i=0;i<10;i++)
+			for(i=0;i<MAX_TEXT_SIZE+1;i++)
 			{ 
 				if(users[i]==cli_reqmsg->id_destino)
 				{
 					sprintf(cli_reqmsg->resposta_cli,"\n~ %s: Mensagem enviada!!\n", cli_reqmsg->path);
 					login=1;
+
+					cli_reqmsg->id_destino=atol(newString[1]);
+					cli_reqmsg->cod_mansgem=atol(newString[2]);
+					strcpy(&cli_reqmsg->texto_msg,newString[3]);
+
 					break;
 				}	
 			}
@@ -176,7 +228,7 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 
 			int login=0;
 			int i;
-			for(i=0;i<10;i++)
+			for(i=0;i<MAX_TEXT_SIZE+1;i++)
 			{ 
 				if(users[i]==cli_reqmsg->cli_id)
 				{
@@ -199,7 +251,7 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			char concatena[MAX_TEXT_SIZE+1];
 
 			strcpy(concatena,"Users logados: \n");
-			for(i=0;i<10;i++)
+			for(i=0;i<MAX_TEXT_SIZE+1;i++)
 			{ 
 				if(users[i]!=0)
 				{
@@ -211,6 +263,12 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			strcpy(cli_reqmsg->resposta_cli,"");
 			strcpy(cli_reqmsg->resposta_cli,concatena);
 			memset (&concatena, 0, sizeof (concatena));
+		}else if(strcmp(cli_reqmsg->comando,"run")==0||strcmp(cli_reqmsg->comando,"RUN")==0)
+		{ 
+			char resp[MAX_TEXT_SIZE+1];
+			sprintf(resp, " gnome-terminal -e ./%s", newString[1]);
+			sprintf(cli_reqmsg->resposta_cli,"\n~ %s : Executado com sucesso!!\n", cli_reqmsg->path);
+			system(resp);
 		}else{
 			sprintf(cli_reqmsg->resposta_cli,"~ %s : Comando não encontrado!!\n", cli_reqmsg->path);
 		}
@@ -260,16 +318,16 @@ void main()
 		// Envia a resposta ao cliente
 		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
 		printf("servidor: enviou resposta ao cliente %ld\n",serv_respmsg.cli_id);
-	
 
-	if (strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0||strcmp(cli_reqmsg.comando,"mail")==0||strcmp(cli_reqmsg.comando,"MAIL")==0)
-	{
-		char teste[MAX_TEXT_SIZE+1];
-		sprintf(teste,"\n~ %s: Remetente %ld, a mensagem é: %s\n", cli_reqmsg.path, cli_reqmsg.cli_id, cli_reqmsg.texto_msg);
-		serv_respmsg.cli_id = cli_reqmsg.id_destino;
-		strcpy(serv_respmsg.resposta,teste);
-		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
+		if (strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0||strcmp(cli_reqmsg.comando,"mail")==0||strcmp(cli_reqmsg.comando,"MAIL")==0)
+		{
+			char teste[MAX_TEXT_SIZE+1];
+			sprintf(teste,"\n~ %s: Remetente %ld, a mensagem é: %s\n", cli_reqmsg.path, cli_reqmsg.cli_id, cli_reqmsg.texto_msg);
+			serv_respmsg.cli_id = cli_reqmsg.id_destino;
+			strcpy(serv_respmsg.resposta,teste);
+			msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
+		}
 	}
-	}
-	exit(0);}
 
+	exit(0);	
+}
