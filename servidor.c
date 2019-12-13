@@ -293,7 +293,6 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			char concatena[MAX_TEXT_SIZE+1];
 
 			strcpy(concatena,"Users logados: \n");
-\		{
 			int i=0;
 			char usersLogados[MAX_TEXT_SIZE+1];
 			char concatena[MAX_TEXT_SIZE+1];
