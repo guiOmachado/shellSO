@@ -123,15 +123,12 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		{ 
 			int i;
 			for(i=0;i<10;i++)
-			{ 
-
-				if(users[i]==cli_reqmsg->cli_id)
-				{
+			{if(users[i]==cli_reqmsg->cli_id){
 					users[i]=0;
 				}	
 			}
 
-			strcpy(cli_reqmsg->resposta_cli,"Cliente deslogado");	
+			strcpy(cli_reqmsg->resposta_cli, "Cliente deslogado");	
 			kill(cli_reqmsg->cli_id, SIGINT);
 		}
 		else if(strcmp(cli_reqmsg->comando,"help")==0||strcmp(cli_reqmsg->comando,"HELP")==0)
@@ -149,7 +146,7 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		{ 	
 			sprintf(cli_reqmsg->resposta_cli,"\n~ %s: Mensagem enviada!!\n", cli_reqmsg->path);
 		}
-		else if(strcmp(cli_reqmsg->comando,"showmail")==0||strcmp(cli_reqmsg->comando,"SHOWMAIL")==0){	sprintf(cli_reqmsg->resposta_cli,"\n~ %s: OK!!\n", cli_reqmsg->path);}
+		else if(strcmp(cli_reqmsg->comando,"showmail")==0||strcmp(cli_reqmsg->comando,"SHOWMAIL")==0){}
 		else if(strcmp(cli_reqmsg->comando,"send")==0||strcmp(cli_reqmsg->comando,"SEND")==0)
 		{ 
 			int login=0;
@@ -263,6 +260,7 @@ void main()
 		// Envia a resposta ao cliente
 		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
 		printf("servidor: enviou resposta ao cliente %ld\n",serv_respmsg.cli_id);
+	
 
 	if (strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0||strcmp(cli_reqmsg.comando,"mail")==0||strcmp(cli_reqmsg.comando,"MAIL")==0)
 	{
@@ -273,6 +271,5 @@ void main()
 		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
 	}
 	}
+	exit(0);}
 
-	exit(0);	
-}
