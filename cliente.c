@@ -26,7 +26,6 @@
 //Struct para receber
 struct respmsg {
 	long cli_id;
-	//char resposta_cli[MAX_TEXT_SIZE+1];
 	char resposta[MAX_TEXT_SIZE+1];
 };
 
@@ -46,10 +45,7 @@ count = count + 71;}else if (init[i]=='s'){count = count + 562;}else if (init[i]
 count = count + 2019;}else if (init[i]=='1'){count = count + 45;}else if (init[i]=='2'){count = count + 12;}else if (init[i]=='3'){count = count + 751;
 }else if (init[i]=='4'){count = count + 2101;}else if (init[i]=='5'){count = count + 1111;}else if (init[i]=='6'){count = count + 777;}else if (init[i]=='7')
 {count = count + 642;}else if (init[i]=='8'){count = count + 314;}else if (init[i]=='9'){count = count + 210;}else{count = count +0;}
-}
-return count;
-
-}
+}return count;}
 
 void main()
 {
@@ -107,8 +103,6 @@ void main()
 	printf("%s\n", serv_respmsg.resposta);*/
 
 	do {
-
-
         //Limpa
 		fflush(stdin);
 		fflush(stdout);
@@ -124,20 +118,17 @@ void main()
        	scanf("%*c");
 		
 		if(strcmp(cli_reqmsg.comando,"godir")==0||(cli_reqmsg.comando,"GODIR")==0){printf("Digite o caminho \n");scanf("%[^\n]s",cli_reqmsg.caminho);scanf("%*c");chdir(cli_reqmsg.caminho);}			
-		if(strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0||strcmp(cli_reqmsg.comando,"run")==0||(cli_reqmsg.comando,"RUN")==0){
-			 printf("~ %s : Digite sua mensagem: ",path);
-				scanf("%[^\n]s",cli_reqmsg.texto_msg);
-       	        scanf("%*c");
-		if(strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0){
-			printf("~ %s : Digite o id destino: ",path);
-				scanf("%ld",&cli_reqmsg.id_destino);
-       	        scanf("%*c");}
-		}
+		if(strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0||strcmp(cli_reqmsg.comando,"run")==0||(cli_reqmsg.comando,"RUN")==0
+		||strcmp(cli_reqmsg.comando,"mail")==0||(cli_reqmsg.comando,"MAIL")==0){printf("~ %s : Digite sua mensagem: ",path);scanf("%[^\n]s",cli_reqmsg.texto_msg);scanf("%*c");
+		
+		if(strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0||strcmp(cli_reqmsg.comando,"mail")==0||(cli_reqmsg.comando,"MAIL")==0){
+		printf("~ %s : Digite o id destino: ",path);scanf("%ld",&cli_reqmsg.id_destino);scanf("%*c");}}
+
 		if(strcmp(cli_reqmsg.comando,"showmail")==0||(cli_reqmsg.comando,"SHOWMAIL")==0){
-		do{msgsnd(req_mq,&cli_reqmsg,sizeof(struct reqmsg),0);if (msgrcv(resp_mq,&serv_respmsg,sizeof(struct respmsg),cli_id,0) < 0){
-		printf("msgrcv falhou no cliente\n");exit(1);}printf("%s\n", serv_respmsg.resposta);}while(strcmp(serv_respmsg.resposta, "")!=0);
-				
-		}	
+		if(strcmp(serv_respmsg.resposta, "")!=0){while(1){{if(msgrcv(resp_mq,&serv_respmsg,sizeof(struct respmsg),cli_id,0) < 0){
+		printf("msgrcv falhou no cliente\n");exit(1);}if(strcmp(serv_respmsg.resposta, "")!=0){printf("%s\n", serv_respmsg.resposta);
+		msgsnd(req_mq,&cli_reqmsg,sizeof(struct reqmsg),0);}else{printf("Acabou as mensagens. \n");break;}}}}else{printf("Nenhuma mensagem. \n");}}	
+
 		//copia o id
 			cli_reqmsg.cli_id = cli_id;
 
@@ -147,19 +138,14 @@ void main()
 		// Espera pela mensagem de resposta especifica para este cliente
 		// usando o PID do processo cliente como tipo de mensagem
 			
-		if (msgrcv(resp_mq,&serv_respmsg,sizeof(struct respmsg),cli_id,0) < 0){
-			printf("msgrcv falhou no cliente\n");
-			exit(1);}
-				
+		if (msgrcv(resp_mq,&serv_respmsg,sizeof(struct respmsg),cli_id,0)<0){
+		printf("msgrcv falhou no cliente\n");
+		exit(1);}		
 		//Apresenta resposta do servidor
-		printf("%s\n", serv_respmsg.resposta);
-			
+		printf("%s\n", serv_respmsg.resposta);	
 		//copia o path
-		path = getcwd(path,0);
-		
-			 
+		path = getcwd(path,0);		 
 	} while(1);
-			
-
 	exit(0);	
 }
+
