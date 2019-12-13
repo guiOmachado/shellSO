@@ -18,7 +18,6 @@
 #include <grp.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <signal.h> 
 
 #define _XOPEN_SOURCE_EXTENDED 1
 #define REQ_QUEUE 	10010
@@ -49,7 +48,6 @@ struct respmsg {
 char * ls(char path[100])
 {
 		  memset (&concat, 0, sizeof (concat) );
-		  memset (&concat, 0, sizeof (concat) );
 		  struct passwd *pw;
 		  struct group *gp;
 		  DIR *mydir;
@@ -59,6 +57,7 @@ char * ls(char path[100])
 		  struct stat fileStat;
 		  mydir=opendir(path);
 		  stat(".",&fileStat);
+
  	 while((myfile=readdir(mydir))!=NULL)
  	{
 		char stat1[MAX_TEXT_SIZE+1],stat2[MAX_TEXT_SIZE+1],stat3[MAX_TEXT_SIZE+1],stat4[MAX_TEXT_SIZE+1],stat5[MAX_TEXT_SIZE+1],stat6[MAX_TEXT_SIZE+1],stat7[MAX_TEXT_SIZE+1],stat8[MAX_TEXT_SIZE+1],stat9[MAX_TEXT_SIZE+1],stat10[MAX_TEXT_SIZE+1],stat11[MAX_TEXT_SIZE+1];
@@ -78,38 +77,6 @@ char * ls(char path[100])
 				pw=getpwuid(fileStat.st_uid);
 		    	gp=getgrgid(fileStat.st_gid);			   
 			    strcat(concat,stat1);
-
- 	 while((myfile=readdir(mydir))!=NULL)
- 	{
-		char 		stat1[MAX_TEXT_SIZE+1],stat2[MAX_TEXT_SIZE+1],stat3[MAX_TEXT_SIZE+1],stat4[MAX_TEXT_SIZE+1],stat5[MAX_TEXT_SIZE+1],stat6[MAX_TEXT_SIZE+1],stat7[MAX_TEXT_SIZE+1],stat8[MAX_TEXT_SIZE+1],stat9[MAX_TEXT_SIZE+1],stat10[MAX_TEXT_SIZE+1],stat11[MAX_TEXT_SIZE+1];
-
-
-
-			if(strcmp(myfile->d_name,".") != 0 && strcmp(myfile->d_name,"..") != 0)
-			{
-
-			    //pegando variaveis 
-			     stat(myfile->d_name,&fileStat);  
-			     strcpy(stat1,(S_ISDIR(fileStat.st_mode)) ? "d" : "-");
-			     strcpy(stat2,(fileStat.st_mode & S_IRUSR) ? "r" : "-");		    
-			     strcpy(stat3,(fileStat.st_mode & S_IWUSR) ? "w" : "-");
-			     strcpy(stat4,(fileStat.st_mode & S_IXUSR) ? "x" : "-");
-			     strcpy(stat5,(fileStat.st_mode & S_IRGRP) ? "r" : "-");
-			     strcpy(stat6,(fileStat.st_mode & S_IWGRP) ? "w" : "-");
-			     strcpy(stat7,(fileStat.st_mode & S_IXGRP) ? "x" : "-");
-			     strcpy(stat8,(fileStat.st_mode & S_IROTH) ? "r" : "-");
-			     strcpy(stat9,(fileStat.st_mode & S_IWOTH) ? "w" : "-");
-			     strcpy(stat10,(fileStat.st_mode & S_IXOTH) ? "x" : "-"); 
-
-			    	//strcpy(stat11,fileStat.st_nlink);
-
-				pw=getpwuid(fileStat.st_uid);
-
-			    	gp=getgrgid(fileStat.st_gid);			   
-
-			    	//c=ctime(&fileStat.st_mtime);
-
-			    	strcat(concat,stat1);
 				strcat(concat,stat2);
 				strcat(concat,stat3);
 				strcat(concat,stat4);
@@ -128,28 +95,6 @@ char * ls(char path[100])
 				strcat(concat,"\n");		
 			}
 	}
-				//for(i=4;i<=15;i++)
-				//{
-					//char str[10];
-					//sprintf(str, "%i", c[i]);
-				      	//strcat(concat,str);
-				//}
-				strcat(concat,pw->pw_name);
-				strcat(concat," ");
-				strcat(concat,myfile->d_name);				
-				strcat(concat,"\n");
-
-				//strcat(concat,stat11);
-				//strcat(concat,pw);
-				//strcat(concat,gp);
-				//strcat(concat,c);		
-
-			}		
-
-	}
-
-
-
   closedir(mydir);  
   return concat;
 }
@@ -163,9 +108,6 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			char *teste = ls(cli_reqmsg->path);
 			strcpy(cli_reqmsg->resposta_cli,teste);
 			
-		} else if (strcmp(cli_reqmsg->comando,"clear")==0|| strcmp(cli_reqmsg->comando,"CLEAR")==0)
-		{
-			strcpy(cli_reqmsg->resposta_cli, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n=================================================================\n================SHELL SISTOPERACIONAIS INICIOU===================\n===============DIGITE HELP PARA VER OS COMANDOS==================\n============APERTE ENTER PARA EXECUTAR OS COMANADOS==============\n=================================================================\n");
 		}
 		else if(strcmp(cli_reqmsg->comando,"myid")==0|| strcmp(cli_reqmsg->comando,"MYID")==0)
 		{ 
@@ -183,11 +125,6 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			for(i=0;i<10;i++)
 			{ 
 
-		{
-			int i;
-			for(i=0;i<10;i++)
-			{ 
-				
 				if(users[i]==cli_reqmsg->cli_id)
 				{
 					users[i]=0;
@@ -195,12 +132,6 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			}
 
 			strcpy(cli_reqmsg->resposta_cli,"Cliente deslogado");	
-			        	
-				
-			}
-			
-			strcpy(cli_reqmsg->resposta_cli,"Cliente deslogado");				
- 
 			kill(cli_reqmsg->cli_id, SIGINT);
 		}
 		else if(strcmp(cli_reqmsg->comando,"help")==0||strcmp(cli_reqmsg->comando,"HELP")==0)
@@ -217,21 +148,6 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		else if(strcmp(cli_reqmsg->comando,"mail")==0||strcmp(cli_reqmsg->comando,"MAIL")==0)
 		{ 	
 			sprintf(cli_reqmsg->resposta_cli,"\n~ %s: Mensagem enviada!!\n", cli_reqmsg->path);
-			
-			printf("\n\n%s\n\n", cli_reqmsg->aux);
-			long x = cli_reqmsg->cli_id;
-			sprintf(cli_reqmsg->resposta_cli, " gnome-terminal -e %s", cli_reqmsg->texto_msg);
-			system(cli_reqmsg->resposta_cli);
-			printf("\n\n%s\n\n", cli_reqmsg->resposta_cli);
-			
-		}
-		else if(strcmp(cli_reqmsg->comando,"mail")==0||strcmp(cli_reqmsg->comando,"MAIL")==0)
-		{ 	
-		
-		}
-		else if(strcmp(cli_reqmsg->comando,"showmail")==0||strcmp(cli_reqmsg->comando,"SHOWMAIL")==0)
-		{ 
-			
 		}
 		else if(strcmp(cli_reqmsg->comando,"showmail")==0||strcmp(cli_reqmsg->comando,"SHOWMAIL")==0){	sprintf(cli_reqmsg->resposta_cli,"\n~ %s: OK!!\n", cli_reqmsg->path);}
 		else if(strcmp(cli_reqmsg->comando,"send")==0||strcmp(cli_reqmsg->comando,"SEND")==0)
@@ -260,7 +176,7 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 		}
 		else if(strcmp(cli_reqmsg->comando,"login")==0||strcmp(cli_reqmsg->comando,"LOGIN")==0)
 		{
-	
+
 			int login=0;
 			int i;
 			for(i=0;i<10;i++)
@@ -276,13 +192,6 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			{
 				users[posUser] = cli_reqmsg->cli_id;
 				sprintf(cli_reqmsg->resposta_cli,"\n~ %s: Logado seu id é %ld\n", cli_reqmsg->path, cli_reqmsg->cli_id);
-			        	
-				
-			}
-
-			if(login==0)
-			{
-				users[posUser] = cli_reqmsg->cli_id;
 				posUser++; 
 			}
 		}
@@ -293,16 +202,10 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			char concatena[MAX_TEXT_SIZE+1];
 
 			strcpy(concatena,"Users logados: \n");
-			int i=0;
-			char usersLogados[MAX_TEXT_SIZE+1];
-			char concatena[MAX_TEXT_SIZE+1];
-			
-			strcat(concatena,"     Users logados: \n");
 			for(i=0;i<10;i++)
 			{ 
 				if(users[i]!=0)
 				{
-					
 					snprintf( usersLogados, MAX_TEXT_SIZE+1 , "%d", users[i] );
 					strcat(concatena,usersLogados);
 					strcat(concatena,"\n");
@@ -311,16 +214,6 @@ void *printMsg(struct reqmsg *cli_reqmsg) {
 			strcpy(cli_reqmsg->resposta_cli,"");
 			strcpy(cli_reqmsg->resposta_cli,concatena);
 			memset (&concatena, 0, sizeof (concatena));
-
-			        	
-				if(users[i]!=0)
-				printf("          Users: %d \n", users[i]);
-			}
-
-			
-			strcpy(cli_reqmsg->resposta_cli,concatena);
-			 memset (&concatena, 0, sizeof (concatena) );
-			
 		}else{
 			sprintf(cli_reqmsg->resposta_cli,"~ %s : Comando não encontrado!!\n", cli_reqmsg->path);
 		}
@@ -379,15 +272,6 @@ void main()
 		strcpy(serv_respmsg.resposta,teste);
 		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
 	}
-	if (strcmp(cli_reqmsg.comando,"send")==0||(cli_reqmsg.comando,"SEND")==0)
-	{
-		serv_respmsg.cli_id = cli_reqmsg.id_destino;
-		strcpy(serv_respmsg.resposta,cli_reqmsg.texto_msg);
-		msgsnd(resp_mq,&serv_respmsg,sizeof(struct respmsg),0);
-	}
-
-		
-
 	}
 
 	exit(0);	
